@@ -106,7 +106,7 @@ export default class GameManager extends cc.Component {
 
     }, this);
     this.touchNode.on(cc.Node.EventType.TOUCH_MOVE, (event) => {
-
+      
       // let mouse_pos = event.getLocation();
       // this.currenBlock.setPosition(mouse_pos);
       if (!this.isCanTouch) return;
