@@ -4,21 +4,6 @@ import BlockScript from './BlockScript';
 import transition from './transition';
 import transition2 from './transition2';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var SIZE = { x: 130, y: 130 };
 var COL = 5;
 var ROW = 6;
@@ -106,7 +91,7 @@ export default class GameManager extends cc.Component {
 
     }, this);
     this.touchNode.on(cc.Node.EventType.TOUCH_MOVE, (event) => {
-      
+
       // let mouse_pos = event.getLocation();
       // this.currenBlock.setPosition(mouse_pos);
       if (!this.isCanTouch) return;
@@ -114,44 +99,37 @@ export default class GameManager extends cc.Component {
       let board_idx = this.convertPosToIndex(mouse_pos); // chuyen toa do tro chuot qua cot va hang
       let nodeso_pos = this.convert(board_idx.col, 5); //chuyen toa do cot va hang thanh toa do nodeso
 
-      // console.log(
-      //   "mouse_pos",
-      //   mouse_pos.x,
-      //   mouse_pos.y,
-      //   "mouse moving",
-      //   board_idx.col,
-      //   board_idx.line
-      // );
+   
       this.currenBlock.setPosition(nodeso_pos);
     }, this);
     this.touchNode.on(cc.Node.EventType.TOUCH_END, (_event) => {
       if (!this.isCanTouch) return;
       var blockscript = _this.block;
       var num = parseInt(_this.currenBlock.getComponent(BlockScript).num.string)
-      // blockscript[27] = _this.currenBlock;
-      // blockscript[27].num = parseInt(_this.currenBlock.getComponent(BlockScript).num.string)
-      // var i : number
-      // var j : number
-      // var idx = _this.idx(i,j)
+
       this.isCanTouch = false;
+  
       var B = _this.convertPosToIndex(_this.currenBlock.position)
       var col = B.col;
       for (let j = 0; j < 6; j++) {
 
         if (_this.board[col][j] == null) {
           _this.drop(_this.currenBlock, col, j);
+          
           break;
-
+          
         }
         if (_this.board[col][4] != null && num != blockscript[col + 4 * COL].num) {
           this.Load_Scene();
         }
-
+        
       }
-    //  this.currenBlock = this.spawn(2,5)
+       
+      
+      //
 
-    ////
 
+      // _this.currenBlock = _this.spawn(2,5)
 
     }, this);
 
@@ -541,12 +519,13 @@ export default class GameManager extends cc.Component {
       if (b != 0) {
         mergeNumers[idx] = []; //检查点上的相邻相同数Các số giống hệt nhau liền kề trên các trạm kiểm soát
         this.CheckAround(idx, idx);
-
+ 
         if (mergeNumers[idx].length >= 2) {
           needMerge.push(idx);
-          keep = true
+         
           //  this.continue = true;
         }
+      
       }
     }
     var needMergeCount = needMerge.length;
@@ -687,9 +666,9 @@ export default class GameManager extends cc.Component {
 
   getRand() {
     let rand = Math.random();
-    if (rand < 0.5) {
+    if (rand < 0.2) {
       return 2;
-    } else if (0.5 <= rand && rand < 1) {
+    } else if (0.2 <= rand && rand <= 0.4) {
       return 4;
     }
     // else if( 0.4 <= rand&&rand < 0.7 ){
@@ -701,7 +680,7 @@ export default class GameManager extends cc.Component {
     // else if (0.8 <= rand&&rand < 0.9){
     //   return 32
     // }
-    // else if (0.9 <= rand&&rand < 0.96){
+    // else if (0.9 <= rand&&rand < 1){
     //   return 64
     // }
     // else if (0.96 <= rand&&rand < 1){
@@ -709,11 +688,7 @@ export default class GameManager extends cc.Component {
     // }
 
   }
-  getPoint(mergeNum) {
-    var Point: number;
-    Point = mergeNum
 
-  }
 
 
   drop(currentblock: cc.Node, i, j) {
@@ -722,53 +697,40 @@ export default class GameManager extends cc.Component {
     let highest_line = 5;
     let _this = this;
     var idx = this.idx(i, j)
+   
+    var action1 = cc.callFunc(function(){
+      _this.board[i][j] = currentblock;
 
-    // var action = cc.sequence(
-    //   cc.moveTo(0.05,cc.v2(currentblock.position.x, j * 130 + 130/2)),
-    //   cc.callFunc(function(){
-    //     _this.board[i][j] = currentblock;
+      _this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
 
-    //     _this.block[idx].num = parseInt(_this.currenBlock.getComponent(BlockScript).num.string)
+      _this.block[idx].pic = _this.currenBlock
 
-    //    _this.block[idx].pic = _this.currenBlock
-
-    //    _this.checkMerge([idx]);
-
-
-
-
-    //   //  _this.currenBlock = _this.spawn(midle_column, highest_line);
-    //    _this.isCanTouch = true
-    //   },cc.callFunc(function(){
-    //     _this.currenBlock = _this.spawn(midle_column, highest_line);
-    // })
-
-    //   )
-    // )
-
-    // currentblock.runAction(action)
-
+      _this.checkMerge([idx]);
+     
+      _this.isCanTouch = true
+    })
+  
+    var action2 = cc.callFunc(function(){
+       
+       _this.currenBlock = _this.spawn(midle_column, highest_line)
+    })
 
     cc.tween(currentblock)
-      .to(0.3, { position: new cc.Vec3(currentblock.position.x, j * 130 + 130 / 2) })
-      .call(function () {
-
-        _this.board[i][j] = currentblock;
-
-        _this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
-
-        _this.block[idx].pic = _this.currenBlock
-
-        _this.checkMerge([idx]);
-        _this.currenBlock = _this.spawn(midle_column, highest_line);
-        _this.isCanTouch = true
-      })
-      // .call(function () {
-      //     _this.currenBlock = _this.spawn(midle_column, highest_line);
-      //   })
-
-      
+      .to(0.1, { position: new cc.Vec3(currentblock.position.x, j * 130 + 130 / 2) })
+      .sequence(action1,action2)
       .start();
+      // .call(function () {
+
+      //   _this.board[i][j] = currentblock;
+
+      //   _this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
+
+      //   _this.block[idx].pic = _this.currenBlock
+
+      //   _this.checkMerge([idx]);
+      //   // _this.currenBlock = _this.spawn(midle_column, highest_line);
+      //   _this.isCanTouch = true
+      // })
 
   }
 
