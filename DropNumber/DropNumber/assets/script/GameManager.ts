@@ -24,7 +24,7 @@ export default class GameManager extends cc.Component {
 
   touchNode: cc.Node = null;
   TouchArea: cc.Node = null;
-
+ newnode: cc.Node = null
 
   position: cc.Vec3;
   rowCurrent: number = ROW;
@@ -42,7 +42,8 @@ export default class GameManager extends cc.Component {
   maxIdxCheck: number = 0;
   continue: boolean;
   keep: boolean;
-  isLocked: boolean = true
+  isLocked: boolean
+  
 
   nextNum: number;
   checkCount: number;
@@ -65,35 +66,33 @@ export default class GameManager extends cc.Component {
       let enemy = cc.instantiate(this.nodeso);
       this.Pool1.put(enemy);
     }
-    let self = this;
-
-
-
-
-
-    this.currenBlock = this.spawn(2, 5);
-
-    // this.spawn(0, 0);
-    console.log(
-      "hehe 1",
-      this.currenBlock.position.x,
-      this.currenBlock.position.y
-    );
-
+   
+    // if(this.board[2][5] == cc.Node){
+    //   this.node.resumeSystemEvents(true);
+    //  }
+    
+    this.currenBlock = this.spawn(2, 5)
     this.touchNode.on(cc.Node.EventType.TOUCH_START, (event) => {
-      if (!this.isCanTouch) return;
+      
+       this.isCanTouch = true;
+      // if(this.board[2][5] == null){
+      //   this.isCanTouch = false;
+      //  } 
+      
+       // this.isCanTouch = false
+      // if (!this.isCanTouch) return;
       let mouse_pos = this.touchNode.convertToNodeSpaceAR(event.getLocation()); //toa do tro chuot
       let board_idx = this.convertPosToIndex(mouse_pos); // chuyen toa do tro chuot qua cot va hang
       let nodeso_pos = this.convert(board_idx.col, 5); //chuyen toa do cot va hang thanh toa do nodeso
 
 
       this.currenBlock.setPosition(nodeso_pos);
-
+      
     }, this);
     this.touchNode.on(cc.Node.EventType.TOUCH_MOVE, (event) => {
+      this.isCanTouch = true
 
-      // let mouse_pos = event.getLocation();
-      // this.currenBlock.setPosition(mouse_pos);
+     
       if (!this.isCanTouch) return;
       let mouse_pos = this.touchNode.convertToNodeSpaceAR(event.getLocation()); //toa do tro chuot
       let board_idx = this.convertPosToIndex(mouse_pos); // chuyen toa do tro chuot qua cot va hang
@@ -101,35 +100,34 @@ export default class GameManager extends cc.Component {
 
    
       this.currenBlock.setPosition(nodeso_pos);
+    
     }, this);
     this.touchNode.on(cc.Node.EventType.TOUCH_END, (_event) => {
       if (!this.isCanTouch) return;
+      // this.node.pauseSystemEvents(true);
+      this.isCanTouch = false;
       var blockscript = _this.block;
       var num = parseInt(_this.currenBlock.getComponent(BlockScript).num.string)
-
-      this.isCanTouch = false;
-  
+     
+   
+      
       var B = _this.convertPosToIndex(_this.currenBlock.position)
       var col = B.col;
-      for (let j = 0; j < 6; j++) {
-
-        if (_this.board[col][j] == null) {
-          _this.drop(_this.currenBlock, col, j);
-          
-          break;
-          
-        }
-        if (_this.board[col][4] != null && num != blockscript[col + 4 * COL].num) {
-          this.Load_Scene();
-        }
-        
-      }
-       
       
-      //
-
-
-      // _this.currenBlock = _this.spawn(2,5)
+      for (let j = 0; j < 6; j++) {
+ 
+        
+        if (_this.board[col][j] == null) {
+          _this.drop(_this.currenBlock,col,j)
+          break;         
+        }     
+        
+        if (_this.board[col][4] != null && num != blockscript[col + 4 * COL].num) {
+          _this.Load_Scene();
+        }
+   
+      }
+      
 
     }, this);
 
@@ -222,6 +220,7 @@ export default class GameManager extends cc.Component {
           );
         })(subIdx);
       } else { //Khối tổng hợp sẽ nhấp nháy, sau đó trở thành một khối mới và phóng to lại.
+
         (function (subIdx) {
           action = cc.sequence(
 
@@ -453,54 +452,44 @@ export default class GameManager extends cc.Component {
     var pos = this.pos(idx);
     var x = pos.x
     var y = pos.y
-    // var blockscript = this.currenBlock.getComponent(BlockScript)
+    
     var blockscript = this.block
-    //   blockscript[i] = this.currenBlock
-    // blockscript[i].num = parseInt(this.currenBlock.getComponent(BlockScript).num.string)
+   
     var num = blockscript[idx].num
     if (x > 0) { //left
       if (blockscript[this.idx(x - 1, y)].num == num) {
-        //console.log("same left..")
+        
         this.CheckAround(mergeIdx, this.idx(x - 1, y));
       }
     }
     if (x < COL - 1) {  //right
       if (blockscript[this.idx(x + 1, y)].num == num) {
-        //console.log("same right..")
+        
         this.CheckAround(mergeIdx, this.idx(x + 1, y));
       }
     }
     if (y < ROW - 1) {  //up
       if (blockscript[this.idx(x, y + 1)].num == num) {
-        //console.log("same up..")
+       
         this.CheckAround(mergeIdx, this.idx(x, y + 1));
       }
     }
     if (y > 0) {  //down
       if (blockscript[this.idx(x, y - 1)].num == num) {
-        //console.log("same down..")
+        
         this.CheckAround(mergeIdx, this.idx(x, y - 1));
       }
     }
+   
     return true
-    // for (let a = 0; a < around.length; a++) {
-    //       let _i = i + around[a].i;
-    //       let _j = j + around[a].j;
-    //       if(this.board[_i][_j] === null) continue;
-    //       let nearBlock = this.board[_i][_j].getComponent(BlockScript);
-    //       if (blockscript.num === nearBlock.num) {
-
-    //       } else {
-
-    //       }
-    //     }
+ 
   }
 
 
 
 
   checkMerge(idxes, keep?) {
-
+    // this.isCanTouch = false;
     // this.onInitBlock()
     var a = this.pos(idxes)
     var idx = this.idx(a.x, a.y)
@@ -523,9 +512,8 @@ export default class GameManager extends cc.Component {
         if (mergeNumers[idx].length >= 2) {
           needMerge.push(idx);
          
-          //  this.continue = true;
         }
-      
+       
       }
     }
     var needMergeCount = needMerge.length;
@@ -545,6 +533,7 @@ export default class GameManager extends cc.Component {
       })
 
     }
+    // this.isCanTouch = true;
 
   }
   CreateCube(num) {
@@ -657,9 +646,9 @@ export default class GameManager extends cc.Component {
 
     enemy.setPosition(this.convert(colum, line));
 
+  
 
-
-    return enemy;
+    return enemy 
   }
 
 
@@ -698,42 +687,53 @@ export default class GameManager extends cc.Component {
     let _this = this;
     var idx = this.idx(i, j)
    
-    var action1 = cc.callFunc(function(){
-      _this.board[i][j] = currentblock;
-
-      _this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
-
-      _this.block[idx].pic = _this.currenBlock
-
-      _this.checkMerge([idx]);
-     
-      _this.isCanTouch = true
-    })
+  
+   
   
     var action2 = cc.callFunc(function(){
-       
+    
+
        _this.currenBlock = _this.spawn(midle_column, highest_line)
     })
-
+  
     cc.tween(currentblock)
-      .to(0.1, { position: new cc.Vec3(currentblock.position.x, j * 130 + 130 / 2) })
-      .sequence(action1,action2)
-      .start();
-      // .call(function () {
-
-      //   _this.board[i][j] = currentblock;
-
-      //   _this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
-
-      //   _this.block[idx].pic = _this.currenBlock
-
-      //   _this.checkMerge([idx]);
-      //   // _this.currenBlock = _this.spawn(midle_column, highest_line);
-      //   _this.isCanTouch = true
-      // })
-
+    .to(0.1, { position: new cc.Vec3(currentblock.position.x, j * 130 + 130 / 2) })
+    
+    .call(()=> this.MergeX(idx,i,j,currentblock))
+   
+    
+    .call(() => this.MergeY())
+    
+    .start();
   }
 
-}
+  MergeX(idx : number,i :number,j:number, currentblock :cc.Node)
+  {
+   
+    this.board[i][j] = currentblock;
+
+    this.block[idx].num = parseInt(currentblock.getComponent(BlockScript).num.string)
+
+    this.block[idx].pic = currentblock;
+
+    this.checkMerge([idx]);
+   
+  
+  }
+  MergeY(){
+    this.schedule(function(){
+       this.currenBlock = this.spawn(2, 5)
+      this.board[2][5] = this.currenBlock;
+
+    },0,0,0.43);
+ 
+    
+  }
+  
+
+  }
+ 
+
+
 
 
